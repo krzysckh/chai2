@@ -97,6 +97,45 @@ software.  Because a virtual machine is not needed to unpack fasl
 encoded lists, it's much easier to interpret a database that uses them
 instead of finite functions.
 
+repl
+----
+
+chai2 includes a REPL used for editing the database.  You can enter the
+REPL by using the `-e' or `--edit' flag.  You will be greeted by a very
+non-user-friendly prompt:
+
+?
+
+This is the toplevel, it accepts commands as follows:
+- help:         shows available commands
+- list:         lists all images
+- tags:         lists all tags
+- tag tag-name: lists all images under tag `tag-name'
+- rebuild:      same as `chai --rebuild'
+- pick id:      selects image with id `id' for editing and enters
+                edit mode
+- quit:         exits
+
+The edit mode queues edits for applying with the `save' command.
+If you choose not to commit the changes, just use the `quit command.
+The `remove' command is *not* queued, but it does ask for confirmation.
+All commands accepted by the edit mode:
+- help:                   shows available commands
+- set-tags tag1 tag2 ...: sets the tag list to (tag1 tag2 ...)
+- tags:                   lists tags of currently picked image
+- set-timestamp timeval:  sets the timestamp of picked image to timeval
+- timestamp:              prints timestamp of picked image
+- remove:                 removes the currently picked image from the db
+- save:                   saves changes and quits.
+- quit:                   quits without saving changes
+
+Note that the REPL will not remove image files from the disk.  It only
+operates on chai.db.  Images removed from the database will still be
+accessible, just not listed.
+chai will not rebuild your website automatically after applying changes
+to the database. Use the `-r', `--rebuild' flag or the `rebuild' command
+to rebuild it manually.
+
 bonus
 -----
 

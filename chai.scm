@@ -1,6 +1,7 @@
 (import
  (owl toplevel)
  (owl args)
+ (owl readline)
  (robusta full)
  (prefix (owl sys) sys/)
  )
@@ -10,6 +11,7 @@
    `((help    "-h" "--help")
      (rebuild "-r" "--rebuild"             comment "rebuild")
      (config  "-c" "--config-file" has-arg comment "set config file" default "chai.cfg")
+     (edit    "-e" "--edit"                comment "enter interactive db edit mode")
      )))
 
 (define-syntax define-config
@@ -175,12 +177,15 @@
          (iota 1 1 (+ 1 last-page)))
         (copy-file "1.html" "index.html")))))
 
+(define (tag->items db tag)
+  (ff-fold (λ (a k v)
+             (if (has? (get v 'tags '()) tag)
+                 (cons (cons k v) a)
+                 a))
+           #n db))
+
 (define (write-tag-files! config db tag)
-  (let ((images (ff-fold (λ (a k v)
-                           (if (has? (get v 'tags '()) tag)
-                               (cons v a)
-                               a))
-                         #n db)))
+  (let ((images (map cdr (tag->items db tag))))
     (write-paginated! config db (format #f "tags/~a" tag) tag images)))
 
 (define (rebuild config . db*)
@@ -218,6 +223,103 @@
     (save-database config new-db)
     0))
 
+(define (with-readline-handler prompt handler)
+  (readline-result-stream
+   '()
+   (λ () (display prompt))
+   (λ (str cont)
+     (lets ((l ((string->regex "c/ /") str))
+            (l* (if (null? l)
+                    (tuple '_)
+                    (list->tuple (cons (string->symbol (car l)) (cdr l))))))
+       (print "")
+       (handler l* cont)))
+   (λ _ _ #f)
+   readline-default-options))
+
+(define (edit! id config db ob cont!)
+  (with-readline-handler (str id "? ")
+    (λ (l cont)
+      (case (ref l 1)
+        ('help
+         (print '(help set-tags tags timestamp set-timestamp remove save quit))
+         (cont))
+        ('tags
+         (print (get ob 'tags))
+         (cont))
+        ('timestamp
+         (format stdout "~a (~a)~%" (get ob 'timestamp) (date-str (get ob 'timestamp)))
+         (cont))
+        ('set-timestamp
+         (print "ok")
+         (edit! id config db (put ob 'timestamp (string->number (ref l 2))) cont!))
+        ('set-tags
+         (print "ok")
+         (edit! id config db (put ob 'tags (map string->symbol (cdr (tuple->list l)))) cont!))
+        ('save
+         (save-database config (put db id ob))
+         (print "saved")
+         (cont!))
+        ('remove
+         (with-readline-handler "are you sure? [y/n] "
+           (λ (yn cont*)
+             (tuple-case yn
+               ((y)
+                (save-database config (del db id))
+                (print "saved")
+                (cont!))
+               ((n) (cont))
+               (else (cont*))))))
+        ('quit
+         (print "did not save")
+         (cont!))
+        (else
+         (print "bad command")
+         (cont))))))
+
+(define (edit/display-ob config id ob)
+  (format stdout "[~a] ~a ~a/~a~%"
+          id (get ob 'tags)
+          (get config 'host) (get ob 'filename-minimized)))
+
+(define (edit config)
+  (let ((db (load-database config)))
+    (with-readline-handler "? "
+      (λ (l cont)
+        (tuple-case l
+          ((help)
+           (print '(list tags tag pick rebuild quit)))
+          ((rebuild)
+           (rebuild config)
+           (cont))
+          ((list)
+           (ff-fold (λ (_ k v)
+                      (edit/display-ob config k v)) #n db)
+           (cont))
+          ((tags)
+           (print (get-all-tags db))
+           (cont))
+          ((tag t)
+           (let ((its (tag->items db (string->symbol t))))
+             (for-each
+              (λ (it*)
+                (let ((k (car it*))
+                      (it (cdr it*)))
+                  (edit/display-ob config k it)))
+              its)
+             (cont)))
+          ((pick id*)
+           (if-lets ((id (string->symbol id*))
+                     (ob (get db id)))
+             (edit! id config db ob (λ () (edit config)))
+             (begin
+               (print "no such id")
+               (cont))))
+          ((quit) (print 'bye) #t)
+          (else
+           (print "bad command")
+           (cont)))))))
+
 (define (help args)
   (print "Usage: " (car args) " file tag ...")
   (print-rules command-line-rules)
@@ -231,7 +333,9 @@
        (help args))
 
      (let ((config (eval (read (list->string (file->list (get opt 'config)))) *toplevel*)))
-       (if (get opt 'rebuild)
-           (rebuild config)
-           (add-image config extra))
+       (cond
+        ((get opt 'rebuild) (rebuild config))
+        ((get opt 'edit)    (edit config))
+        (else
+         (add-image config extra)))
        0))))
