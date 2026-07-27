@@ -120,7 +120,7 @@
 (define (render-image config ob)
   `(article
     ((a (href . ,(str "/" (get ob 'filename))))
-     ((img (src . ,(str "/" (get ob 'filename-minimized))))))
+     ((img (loading . "lazy") (src . ,(str "/" (get ob 'filename-minimized))))))
     ,(render-tags (get ob 'tags '()) "image-tags" "")
     ,((get config 'display-time-function str) (get ob 'timestamp 0))
     (hr)))
