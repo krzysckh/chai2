@@ -54,7 +54,7 @@
   (if (sys/directory? path)
       path
       (begin
-        (if (sys/mkdir path #o775)
+        (if (sys/mkdir path #o777)
             path
             (error "couldn't mkdir " path)))))
 
@@ -137,6 +137,7 @@
 
 (define (write-paginated! config db root title items)
   (with-directory (www-root config)
+    (ensure-directory "tags")
     (with-directory root
       (let* ((all-tags (get-all-tags db))
              (spl (split-every items (get config 'items-per-page 20)))

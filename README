@@ -39,40 +39,46 @@ Most config keys have sane defaults.  Some config keys require Owl
 functions as values, they definitely have defaults.
 Values you can set in the configuration file are as follows:
 
-id-length:             How long a picture's randomly generated id will
-                       be.  A number, preferably.
-database:              Location of the database.  Relative to PWD.
-                       A string, preferably.
-www-root:              Location of the public WWW root.
-                       Relative to PWD.  A string, preferably.
-host:                  Your webpage's hostname with the protocol.
-                       This will be used while generating rss.
-                       Examples include "https://example.com",
-                       "http://i-dislike-tls.net/here/are/images".
-                       A string, preferably.
-items-per-page:        How many pictures should a single page hold.
-                       A number, preferably.
-rss-description:       Description of the RSS feed.  A string,
-                       preferably.
-css:                   Linked css file.  This will be inserted to the
-                       generated page as a <link> element. So it should
-                       be relative to www-root.  Note, that tag
-                       directories will link this file as well, so it
-                       should be an absolute path, for example
-                       "/styles.css", or "/static/something.css".
-                       A string, preferably.
-rss:                   Linked rss file that will be generated every
-                       rebuild.  Relative to www-root. Should follow
-                       same guidelines as css.  A string, preferably.
-name:                  Webpage's name.  A string, preferably.
-default-tags:          List of default tags that will be set, when an
-                       image is not given any tags. Preferably a list of
-                       symbols.
-display-time-function: A function of posix timestamp -> robusta HTML
-                       expression. This should render the posix
-                       timestamp in a desired format.
-html-heading:          A function of title -> robusta HTML expression.
-                       This should render the title in a desired format.
+id-length:               How long a picture's randomly generated id will
+                         be.  A number, preferably.
+database:                Location of the database.  Relative to PWD.
+                         A string, preferably.
+www-root:                Location of the public WWW root.
+                         Relative to PWD.  A string, preferably.
+host:                    Your webpage's hostname with the protocol.
+                         This will be used while generating rss.
+                         Examples include "https://example.com",
+                         "http://i-dislike-tls.net/here/are/images".
+                         A string, preferably.
+items-per-page:          How many pictures should a single page hold.
+                         A number, preferably.
+rss-description:         Description of the RSS feed.  A string,
+                         preferably.
+css:                     Linked css file.  This will be inserted to the
+                         generated page as a <link> element, so it
+                         should be relative to www-root.  Note, that tag
+                         directories will link this file as well, so it
+                         should be an absolute path, for example
+                         "/styles.css", or "/static/something.css".
+                         A string, preferably.
+rss:                     Linked rss file that will be generated every
+                         rebuild.  Relative to www-root. Should follow
+                         same guidelines as css.  A string, preferably.
+name:                    Webpage's name.  A string, preferably.
+default-tags:            List of default tags that will be set, when an
+                         image is not given any tags. Preferably a list
+                         of symbols.
+display-time-function:   A function of posix timestamp -> robusta HTML
+                         expression. This should render the posix
+                         timestamp in a desired format.
+html-heading:            A function of title -> robusta HTML expression.
+                         This should render the title in a desired
+                         format.
+minimize-image-function: Function of filename -> filename.
+                         This function may minimize a file `filename'
+                         and return the new file name.  It should
+                         not remove the old file.  The new (returned)
+                         filename will be served as the thumbnail.
 
 metadata storage
 ----------------
