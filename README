@@ -96,3 +96,31 @@ and not a finite function so it would be easier to read it with other
 software.  Because a virtual machine is not needed to unpack fasl
 encoded lists, it's much easier to interpret a database that uses them
 instead of finite functions.
+
+bonus
+-----
+
+fuji# ol
+You see a prompt.
+> (define db (fasl-load "chai.db" #f))
+;; Defined db
+> (define img (assoc 'jylqqggm db))
+;; Defined img
+> img
+'(jylqqggm (filename . "jylqqggm.jpg")
+  (filename-minimized . "jylqqggm.jpg-small.jpg")
+  (timestamp . 1785152592) (tags tatry))
+> (define img* (led img 4 (C append '(panopticon))))
+;; Defined img*
+> img*
+'(jylqqggm (filename . "jylqqggm.jpg")
+  (filename-minimized . "jylqqggm.jpg-small.jpg")
+  (timestamp . 1785152592) (tags tatry panopticon))
+> (define db* (filter (B not (B (C eq? 'jylqqggm) car)) db))
+;; Defined db*
+> (define db** (cons img* db*))
+;; Defined db**
+> (fasl-save db** "chai.db")
+#true
+> ,quit
+fuji#
