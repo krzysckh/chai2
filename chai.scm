@@ -201,7 +201,7 @@
     (error "no image was provided" ()))
   (lets ((db (load-database config))
          (filename tags data)
-         (tags (if (null? tags) (get config 'default-tags '(unknown)) tags))
+         (tags (if (null? tags) (get config 'default-tags '(unknown)) (map string->symbol tags)))
          (id (generate-id config db))
          (new-filename (str id "." (extension-of filename)))
          (_ (copy-file filename (str (www-root config) "/" new-filename)))
