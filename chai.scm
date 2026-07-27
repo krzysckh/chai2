@@ -151,6 +151,7 @@
                 `(html
                   (head
                    ((meta (charset . "utf-8")))
+                   ((meta (name . "viewport") (content . "width=device-width, initial-scale=1.0")))
                    ((link (rel . "stylesheet") (href . ,(get config 'css "/style.css"))))
                    ((link (rel . "alternate") (type . "application/rss+xml") (href . ,(get config 'rss "/posts.rss"))))
                    (title ,title))
