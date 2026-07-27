@@ -1,0 +1,92 @@
+running chai2
+-------------
+
+After running `make', possibly after configuring OL to your location of
+Owl Lisp, it will spit out a `chai' binary in current working directory.
+Save it somewhere safe.  Good places include
+  - right next to your gallery
+  - /usr/local/bin
+
+Note that chai2 loads the configuration file on demand; every run.
+It may be specified with the `-c', or `--config-file' flag.
+
+To add an image to your site, run
+`chai image-filename.extension tag1 tag2 ...'. Note a single image can
+use many tags as well as none.  If no tags are specified, chai will
+automatically set them to `default-tags' defined in the config.
+By default, this is (unknown).
+
+To rebuild the entire page, without adding additional images,
+run chai with the `-r', or `--rebuild' flag.  This will ensure all pages
+are up to date with the database.  This should not be needed unless
+you touch the database with external software.
+
+configuration file
+------------------
+
+By defualt, configuration is stored in chai.cfg.
+This configuration file should contain a single (define-config ...)
+expression.  The format is as follows:
+
+  (define-config
+    key1 => value1
+    key2 => value2
+    ...)
+
+Every value after the `=>' token will be evaluated in the *toplevel*
+as an Owl Lisp expression.  The values may be of any lisp type.
+Most config keys have sane defaults.  Some config keys require Owl
+functions as values, they definitely have defaults.
+Values you can set in the configuration file are as follows:
+
+id-length:             How long a picture's randomly generated id will
+                       be.  A number, preferably.
+database:              Location of the database.  Relative to PWD.
+                       A string, preferably.
+www-root:              Location of the public WWW root.
+                       Relative to PWD.  A string, preferably.
+host:                  Your webpage's hostname with the protocol.
+                       This will be used while generating rss.
+                       Examples include "https://example.com",
+                       "http://i-dislike-tls.net/here/are/images".
+                       A string, preferably.
+items-per-page:        How many pictures should a single page hold.
+                       A number, preferably.
+rss-description:       Description of the RSS feed.  A string,
+                       preferably.
+css:                   Linked css file.  This will be inserted to the
+                       generated page as a <link> element. So it should
+                       be relative to www-root.  Note, that tag
+                       directories will link this file as well, so it
+                       should be an absolute path, for example
+                       "/styles.css", or "/static/something.css".
+                       A string, preferably.
+rss:                   Linked rss file that will be generated every
+                       rebuild.  Relative to www-root. Should follow
+                       same guidelines as css.  A string, preferably.
+name:                  Webpage's name.  A string, preferably.
+default-tags:          List of default tags that will be set, when an
+                       image is not given any tags. Preferably a list of
+                       symbols.
+display-time-function: A function of posix timestamp -> robusta HTML
+                       expression. This should render the posix
+                       timestamp in a desired format.
+html-heading:          A function of title -> robusta HTML expression.
+                       This should render the title in a desired format.
+
+metadata storage
+----------------
+
+chai.db is a fasl-encoded association list storing key-value
+pairs of file-id -> metadata.  the metadata is an association list
+with keys including, but not limited to:
+ - filename: a string holding the value of original file name
+ - filename-minimized: a string holding the value of the minimized file.
+                       this is shown as the picture's thumbnail
+ - timestamp: an integer holding the posix timestamp
+ - tags: a list of symbols holding tags of the given file
+I've decided to store the database as a fasl-encoded association list,
+and not a finite function so it would be easier to read it with other
+software.  Because a virtual machine is not needed to unpack fasl
+encoded lists, it's much easier to interpret a database that uses them
+instead of finite functions.
