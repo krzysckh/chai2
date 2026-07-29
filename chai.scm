@@ -111,11 +111,13 @@
 (define (extension-of file)
   (last ((string->regex "c/\\./") file) "jpg"))
 
+(define sort-tags (H sort (λ (a b) (string-ci<? (str a) (str b)))))
+
 (define (render-tags tags class desc)
   `((div (id . ,class))
     ,desc ,@(map (λ (t)
                    `((span (class . "tag")) ((a (href . ,(format #f "/tags/~a/1.html" t))) ,t) " "))
-                 tags)))
+                 (sort-tags tags))))
 
 (define (render-image config ob)
   `(article
@@ -126,7 +128,7 @@
     (hr)))
 
 (define (get-all-tags db)
-  (ff-fold (λ (a k v) (union a (get v 'tags #n))) #n db))
+  (sort-tags (ff-fold (λ (a k v) (union a (get v 'tags #n))) #n db)))
 
 (define (split-every l n)
   (let loop ((l l))

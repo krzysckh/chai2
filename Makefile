@@ -5,7 +5,7 @@ OLIBS=-i third-party/robusta
 
 all: chai
 chai: chai.c
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $<
+	$(CC) -o $@ $< $(CFLAGS) $(LDFLAGS)
 .scm.c:
 	$(OL) $(OLIBS) -o $@ $<
 run:
