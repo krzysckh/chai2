@@ -106,7 +106,7 @@
                                             '()))
                          (put 'link img))))
                    items)))
-     (get config 'rss "/posts.rss"))))
+     (format #f "./~a" (get config 'rss "/posts.rss")))))
 
 (define (extension-of file)
   (last ((string->regex "c/\\./") file) "jpg"))
